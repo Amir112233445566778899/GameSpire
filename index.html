@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GameSpire</title>
+<meta name="description" content="GameSpire آرشیو بازی، تم‌های متعدد، تاریخچه بازی‌های معروف">
+<meta name="robots" content="index,follow">
+<style>
+:root{
+  --bg:#070a10; --panel:rgba(14,18,28,.93); --card:#151c2b; --line:rgba(255,255,255,.1);
+  --text:#eef2ff; --muted:#8f9cb5; --accent:#ff5a1f; --accent2:#ffb020;
+  --font:Tahoma,"Segoe UI",system-ui,sans-serif;
+}
+*{box-sizing:border-box} html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);transition:background .25s,color .25s}
+body{min-height:100vh} a{color:inherit;text-decoration:none} button,input,textarea{font:inherit;color:inherit}
+img{display:block;max-width:100%}
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(6,8,14,.52),rgba(6,8,14,.7)),url('bg.jpg') center/cover no-repeat;
+  filter:saturate(1.2) contrast(1.06)}
+.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:10px 12px 60px}
+
+.header{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:16px;background:var(--panel);position:sticky;top:6px;z-index:30;backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:6px;font-weight:900;font-size:14px}
+.brand i{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent2));font-style:normal;font-size:10px;color:#fff}
+.search{flex:1;min-width:130px}
+.search input{width:100%;padding:8px 10px;border-radius:11px;border:1px solid var(--line);background:rgba(0,0,0,.28);outline:none;font-size:12px}
+.tools,.userbox{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.tools button,.userbox button{border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);padding:6px 9px;border-radius:999px;cursor:pointer;font-size:11px}
+.tools button.on,.tools button:hover,.userbox button:hover{color:var(--text);border-color:var(--accent);background:color-mix(in srgb,var(--accent) 18%,transparent)}
+.userbox span{font-size:11px;color:var(--muted)}
+
+.hero{padding:14px 2px 4px}
+.hero h1{margin:0 0 4px;font-size:1.3rem}
+.hero p{margin:0;color:var(--muted);font-size:12px;line-height:1.65}
+.stats{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.stats div{padding:7px 9px;border-radius:11px;background:rgba(255,255,255,.04);border:1px solid var(--line);min-width:88px}
+.stats b{display:block;color:var(--accent2);font-size:13px}
+.stats span{font-size:10px;color:var(--muted)}
+.sec{margin-top:14px}
+.sec-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px}
+.sec-h h2{margin:0;font-size:13px}
+.sec-h span{color:var(--accent2);font-size:11px}
+.cats{display:flex;gap:6px;overflow:auto;padding-bottom:6px;margin-bottom:8px}
+.cats button{flex:0 0 auto;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);padding:6px 10px;border-radius:10px;cursor:pointer;font-size:11px;white-space:nowrap}
+.cats button.on{color:var(--text);border-color:var(--accent);background:color-mix(in srgb,var(--accent) 18%,transparent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;transition:transform .15s,border-color .15s;display:flex;flex-direction:column;min-height:175px}
+.card:hover{transform:translateY(-2px);border-color:var(--accent)}
+.cover{height:88px;position:relative;background:#101624}
+.cover img{width:100%;height:100%;object-fit:cover}
+.badge{position:absolute;top:5px;right:5px;font-size:9px;font-weight:800;padding:2px 5px;border-radius:6px;background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.1)}
+.badge.FREE{color:#86efac}.badge.MOD{color:#fde68a}.badge.IR{color:#fda4af}.badge.CLASSIC{color:#93c5fd}.badge.NEW{color:#f9a8d4}.badge.WEB{color:#7dd3fc}.badge.HOT{color:#fb7185}
+.body{padding:7px;display:flex;flex-direction:column;gap:4px;flex:1}
+.body h3{margin:0;font-size:11.5px;line-height:1.35;min-height:30px}
+.hint{margin-top:auto;font-size:10px;color:var(--accent2);text-align:center}
+.more{width:100%;margin-top:8px;padding:9px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);font-weight:700;cursor:pointer;font-size:12px}
+
+/* themes strip */
+.themes{display:flex;gap:6px;overflow:auto;padding-bottom:4px}
+.themes button{flex:0 0 auto;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);padding:6px 10px;border-radius:999px;cursor:pointer;font-size:11px}
+.themes button.on{color:#fff;border-color:var(--accent);background:color-mix(in srgb,var(--accent) 22%,transparent)}
+
+.ai{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}
+.ai h2{margin:0 0 4px;font-size:13px}
+.ai .sub{color:var(--muted);font-size:11px;margin-bottom:6px}
+.chat{height:180px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:8px;background:rgba(0,0,0,.25);margin-bottom:6px}
+.msg{margin-bottom:6px;padding:7px 9px;border-radius:10px;max-width:92%;font-size:12px;line-height:1.6}
+.msg.bot{background:color-mix(in srgb,var(--accent) 12%,transparent);border:1px solid color-mix(in srgb,var(--accent) 25%,transparent)}
+.msg.user{background:rgba(255,255,255,.06);border:1px solid var(--line);margin-right:auto}
+.row{display:flex;gap:6px}
+.row input{flex:1;padding:9px 10px;border-radius:10px;border:1px solid var(--line);background:rgba(0,0,0,.25);outline:none;font-size:12px}
+.row button{padding:9px 12px;border:0;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#111;font-weight:800;cursor:pointer;font-size:12px}
+.quick{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.quick button{border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);padding:5px 8px;border-radius:999px;cursor:pointer;font-size:10px}
+
+/* history */
+.hist-list{display:flex;flex-direction:column;gap:10px}
+.hist{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
+.hist h3{margin:0 0 4px;font-size:13px;color:var(--accent2)}
+.hist .meta{font-size:10px;color:var(--muted);margin-bottom:6px}
+.hist p{margin:0;font-size:12px;line-height:1.8;color:#c9d2e6;white-space:pre-line}
+
+/* auth modal - premium */
+.overlay{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:14px;background:rgba(0,0,0,.72);backdrop-filter:blur(10px)}
+.overlay.open{display:flex}
+.auth-card{
+  width:min(420px,100%);border-radius:22px;overflow:hidden;
+  background:linear-gradient(165deg,rgba(24,30,44,.98),rgba(12,16,26,.98));
+  border:1px solid rgba(255,255,255,.12);box-shadow:0 30px 80px rgba(0,0,0,.55);
+}
+.auth-hero{padding:22px 18px 14px;text-align:center;background:radial-gradient(ellipse at 50% 0%,color-mix(in srgb,var(--accent) 35%,transparent),transparent 70%)}
+.auth-hero .logo{width:48px;height:48px;margin:0 auto 8px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent2));font-weight:900;font-size:14px;color:#fff;box-shadow:0 10px 30px color-mix(in srgb,var(--accent) 40%,transparent)}
+.auth-hero h2{margin:0 0 4px;font-size:1.25rem}
+.auth-hero p{margin:0;font-size:12px;color:var(--muted)}
+.auth-body{padding:8px 18px 18px}
+.tabs{display:flex;gap:6px;margin-bottom:10px;background:rgba(255,255,255,.04);padding:4px;border-radius:12px}
+.tabs button{flex:1;border:0;background:transparent;color:var(--muted);padding:8px;border-radius:9px;cursor:pointer;font-size:12px;font-weight:700}
+.tabs button.on{background:color-mix(in srgb,var(--accent) 22%,transparent);color:#fff}
+.auth-body label{display:block;font-size:11px;color:var(--muted);margin:8px 0 4px}
+.auth-body input{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.28);outline:none;font-size:13px}
+.auth-body input:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
+.auth-body .btn{width:100%;margin-top:12px;padding:12px;border:0;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#111;font-weight:900;cursor:pointer;font-size:13px}
+.auth-body .err{color:#fb7185;font-size:12px;min-height:16px;margin-top:6px;text-align:center}
+.auth-close{position:absolute;top:10px;left:10px;width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:rgba(0,0,0,.4);color:#fff;cursor:pointer}
+.overlay .auth-card{position:relative}
+
+.modal{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:12px;background:rgba(0,0,0,.78);backdrop-filter:blur(7px)}
+.modal.open{display:flex}
+.sheet{width:min(540px,100%);max-height:92vh;overflow:auto;border-radius:16px;background:var(--card);border:1px solid var(--line)}
+.sheet .top{height:150px;position:relative;background:#0f141f}
+.sheet .top img{width:100%;height:100%;object-fit:cover}
+.sheet .top .x{position:absolute;top:8px;left:8px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:rgba(0,0,0,.55);color:#fff;cursor:pointer}
+.sheet .content{padding:12px}
+.sheet h3{margin:0 0 6px;font-size:1.05rem}
+.sheet .tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.sheet .tags span{font-size:10px;padding:3px 7px;border-radius:999px;background:rgba(255,255,255,.06);color:var(--muted)}
+.sheet .desc{margin:0 0 10px;color:#c7d1e6;font-size:12.5px;line-height:1.8;white-space:pre-line}
+.sheet .actions{display:flex;gap:6px;margin-bottom:10px}
+.sheet .actions a,.sheet .actions button{flex:1;text-align:center;padding:9px;border-radius:10px;border:0;cursor:pointer;font-weight:800;font-size:12px}
+.sheet .actions a{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#111}
+.sheet .actions button{background:rgba(255,255,255,.07);color:var(--text);border:1px solid var(--line)}
+.coms h4{margin:0 0 6px;color:var(--accent2);font-size:12px}
+.com{padding:7px 8px;border-radius:9px;background:rgba(255,255,255,.04);border:1px solid var(--line);margin-bottom:5px;font-size:11.5px;line-height:1.55}
+.com b{display:block;margin-bottom:2px;font-size:11px}
+.form{display:flex;gap:5px;margin-top:6px}
+.form input{flex:1;padding:8px;border-radius:9px;border:1px solid var(--line);background:rgba(0,0,0,.25);outline:none;font-size:12px}
+.form button{padding:8px 10px;border:0;border-radius:9px;background:var(--accent2);color:#1a1200;font-weight:800;cursor:pointer;font-size:11px}
+.note{margin-top:12px;padding:10px;border-radius:12px;font-size:11px;line-height:1.7;color:#e7d39c;background:rgba(255,176,32,.08);border:1px solid rgba(255,176,32,.18)}
+footer{text-align:center;color:var(--muted);font-size:10px;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"></div>
+<div class="wrap">
+  <header class="header">
+    <div class="brand"><i>GS</i> GameSpire</div>
+    <div class="search"><input id="q" type="search" placeholder="جستجو..." autocomplete="off"></div>
+    <div class="tools">
+      <button type="button" data-view="games" class="on">بازی‌ها</button>
+      <button type="button" data-view="history">تاریخچه</button>
+      <button type="button" id="btnFav">علاقه</button>
+      <button type="button" id="btnRand">تصادفی</button>
+      <button type="button" id="btnTheme">تم</button>
+    </div>
+    <div class="userbox">
+      <span id="who">مهمان</span>
+      <button type="button" id="btnAuth">ثبت‌نام / ورود</button>
+      <button type="button" id="btnOut" class="hidden">خروج</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h1>GameSpire</h1>
+    <p>آرشیو عظیم · تم‌های رنگی · تاریخچه بازی‌های افسانه‌ای · ثبت‌نام اختیاری</p>
+    <div class="stats">
+      <div><b id="stTotal">0</b><span>کل فهرست</span></div>
+      <div><b id="stShow">0</b><span>نمایش</span></div>
+      <div><b id="stCat">pc</b><span>دسته</span></div>
+      <div><b id="stUser">مهمان</b><span>حساب</span></div>
+    </div>
+  </section>
+
+  <section class="sec" id="themeSec">
+    <div class="sec-h"><h2>تم ظاهر</h2><span>کلیک = اعمال</span></div>
+    <div class="themes" id="themes"></div>
+  </section>
+
+  <section class="sec" id="gamesView">
+    <div class="sec-h"><h2>دسته‌ها</h2><span id="secCount">—</span></div>
+    <div class="cats" id="cats"></div>
+    <div class="grid" id="grid"></div>
+    <button class="more" type="button" id="more">۱۲۰ عنوان بعدی…</button>
+  </section>
+
+  <section class="sec hidden" id="historyView">
+    <div class="sec-h"><h2>تاریخچه بازی‌های معروف</h2><span>جزئیات</span></div>
+    <div class="hist-list" id="histList"></div>
+  </section>
+
+  <section class="sec">
+    <div class="ai">
+      <h2>از گیم‌اسپایر بپرسید</h2>
+      <div class="sub">راهنمای فارسی بازی‌ها · بدون کلید API</div>
+      <div class="chat" id="chat"></div>
+      <div class="row"><input id="aiIn" placeholder="از گیم‌اسپایر بپرسید..."><button type="button" id="aiGo">ارسال</button></div>
+      <div class="quick">
+        <button type="button" data-q="تاریخچه ماینکرافت چیه؟">ماینکرافت</button>
+        <button type="button" data-q="تاریخچه GTA">GTA</button>
+        <button type="button" data-q="روبلکس از کجا دانلود کنم؟">روبلکس</button>
+        <button type="button" data-q="بازی ایرانی بازار">ایرانی</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><h2>پرطرفدار</h2><span>Top</span></div>
+    <div class="grid" id="hot"></div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><h2>تحت وب</h2><span>لینک اصلی</span></div>
+    <div class="grid" id="web"></div>
+  </section>
+
+  <div class="note">ثبت‌نام اختیاری است. کاورها داخل سایت ساخته می‌شوند (بدون فیلتر). لینک‌ها به منبع رسمی/مرتبط می‌روند.</div>
+  <footer>GameSpire</footer>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="overlay" id="authOverlay">
+  <div class="auth-card">
+    <button class="auth-close" type="button" id="authClose">×</button>
+    <div class="auth-hero">
+      <div class="logo">GS</div>
+      <h2>به GameSpire خوش آمدید</h2>
+      <p>ثبت‌نام اختیاری است · برای نظر و علاقه پیشنهاد می‌شود</p>
+    </div>
+    <div class="auth-body">
+      <div class="tabs">
+        <button type="button" id="tabReg" class="on">ثبت‌نام</button>
+        <button type="button" id="tabLog">ورود</button>
+      </div>
+      <div id="regBox">
+        <label>نام کاربری</label>
+        <input id="regUser" maxlength="24" placeholder="مثلاً hesam">
+        <label>ایمیل</label>
+        <input id="regEmail" type="email" placeholder="name@email.com">
+        <label>رمز عبور</label>
+        <input id="regPass" type="password" maxlength="64" placeholder="حداقل ۶ کاراکتر">
+        <button class="btn" type="button" id="btnReg">ساخت حساب</button>
+      </div>
+      <div id="loginBox" class="hidden">
+        <label>ایمیل یا نام کاربری</label>
+        <input id="logId" placeholder="ایمیل یا یوزرنیم">
+        <label>رمز عبور</label>
+        <input id="logPass" type="password" placeholder="رمز">
+        <button class="btn" type="button" id="btnLog">ورود</button>
+      </div>
+      <div class="err" id="authErr"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="sheet">
+    <div class="top"><img id="mImg" alt=""><button class="x" id="mX" type="button">×</button></div>
+    <div class="content">
+      <h3 id="mTitle">—</h3>
+      <div class="tags" id="mTags"></div>
+      <div class="desc" id="mDesc"></div>
+      <div class="actions">
+        <a id="mGo" href="#" target="_blank" rel="noopener noreferrer">باز کردن / دانلود</a>
+        <button type="button" id="mFav">علاقه</button>
+      </div>
+      <div class="coms">
+        <h4>نظرات بازیکنان</h4>
+        <div id="mComments"></div>
+        <div class="form"><input id="mInput" maxlength="220" placeholder="نظر شما..."><button type="button" id="mSend">ارسال</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var PER_CAT=1500, PAGE=120;
+var CATS=[{id:'pc',t:'PC'},{id:'android',t:'Android'},{id:'iran',t:'ایرانی'},{id:'mod',t:'مود'},{id:'classic',t:'کلاسیک'},{id:'war',t:'جنگی'},{id:'race',t:'ماشینی'},{id:'web',t:'تحت‌وب'}];
+var PREFIX=['Shadow','Neon','Cyber','Iron','Quantum','Pixel','Storm','Dark','Solar','Hyper','Nova','Rusty','Frozen','Crimson','Apex','Blaze','Thunder','Retro','Omega','Prime','Silent','Rapid','Crystal','Void','Legend','Ultra','Mega','Astro','Titan','Ghost'];
+var MID=['Ops','Racer','Wars','Quest','Arena','Tactics','Kart','Craft','Strike','Force','Siege','Drift','Rush','Legacy','Squad','Tycoon','Heroes','Nights','Dawn','Edge','Zone','City','Runner','Battle','Skies'];
+var SUF=['2022','2023','2024','2025','2026','HD','Remastered','Mobile','Online','Free','Origins','Zero','X','Pro','Lite','World','Iran','Plus'];
+var NAMES=['آرمان','کیان','سارا','رضا','نرگس','پویا','مینا','حسین','دانیال','هستی','ایلیا','غزل','آرش','نیما','بهار','فرهاد','یاسمن','ماهان','النا','رادین','شایان','باران','کاوه','رها','آیدا','سام','نیکا','پرهام','لیان','آرمین'];
+
+var THEMES=[
+  {id:'dark-orange',name:'نارنجی تیره',bg:'#070a10',card:'#151c2b',panel:'rgba(14,18,28,.93)',text:'#eef2ff',muted:'#8f9cb5',accent:'#ff5a1f',accent2:'#ffb020'},
+  {id:'black-white',name:'سیاه سفید',bg:'#0a0a0a',card:'#161616',panel:'rgba(20,20,20,.94)',text:'#f5f5f5',muted:'#a3a3a3',accent:'#ffffff',accent2:'#d4d4d4'},
+  {id:'black-blue',name:'سیاه آبی',bg:'#070b14',card:'#121a2b',panel:'rgba(12,18,32,.94)',text:'#e8f0ff',muted:'#8aa0c2',accent:'#3b82f6',accent2:'#60a5fa'},
+  {id:'black-red',name:'سیاه قرمز',bg:'#10080a',card:'#1c1014',panel:'rgba(28,12,16,.94)',text:'#ffe8ec',muted:'#c49aa3',accent:'#ef4444',accent2:'#fb7185'},
+  {id:'black-indigo',name:'سیاه نیلی',bg:'#0a0a16',card:'#141428',panel:'rgba(16,16,36,.94)',text:'#ececff',muted:'#9a9ac8',accent:'#6366f1',accent2:'#a5b4fc'},
+  {id:'black-green',name:'سیاه سبز',bg:'#07110c',card:'#102018',panel:'rgba(12,28,20,.94)',text:'#e8fff3',muted:'#8fb8a3',accent:'#22c55e',accent2:'#86efac'},
+  {id:'black-cyan',name:'سیاه فیروزه',bg:'#071016',card:'#102028',panel:'rgba(10,24,32,.94)',text:'#e6fbff',muted:'#8ab8c4',accent:'#06b6d4',accent2:'#67e8f9'},
+  {id:'black-pink',name:'سیاه صورتی',bg:'#120810',card:'#22101c',panel:'rgba(32,12,28,.94)',text:'#ffeaf6',muted:'#c49ab8',accent:'#ec4899',accent2:'#f9a8d4'},
+  {id:'black-gold',name:'سیاه طلایی',bg:'#100e08',card:'#1c1a10',panel:'rgba(28,24,12,.94)',text:'#fff8e6',muted:'#c4b48a',accent:'#eab308',accent2:'#fde68a'},
+  {id:'midnight-purple',name:'بنفش نیمه‌شب',bg:'#0c0814',card:'#181222',panel:'rgba(22,16,34,.94)',text:'#f3e8ff',muted:'#b29ac8',accent:'#a855f7',accent2:'#d8b4fe'}
+];
+
+function cover(title,c1,c2){
+  var t=String(title).slice(0,15).replace(/[<>&]/g,'');
+  var svg='<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="'+c1+'"/><stop offset="1" stop-color="'+c2+'"/></linearGradient></defs><rect width="640" height="360" fill="url(#g)"/><text x="50%" y="52%" dominant-baseline="middle" text-anchor="middle" font-family="Tahoma,Segoe UI" font-size="30" font-weight="800" fill="rgba(255,255,255,.93)">'+t+'</text></svg>';
+  return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+}
+function hsl(i,s,l){return 'hsl('+((i*47)%360)+','+s+'%,'+l+'%)'}
+function hash(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h}
+function longDesc(name,kind){
+  return name+' در فهرست '+(kind||'GameSpire')+' قرار دارد.\n\nاین توضیح برای آشنایی سریع با حس بازی، سبک و کاربردش نوشته شده است. قبل از نصب از منبع رسمی استفاده کنید و روی دستگاههای ضعیف تنظیمات گرافیک را کاهش دهید.\n\nمودها را فقط بعد از نصب نسخه اصلی اضافه کنید.';
+}
+function seedComments(seed){
+  var h=hash(String(seed));
+  var out=[], used={};
+  for(var i=0;i<5;i++){
+    var n=NAMES[(h+i*7)%NAMES.length];
+    if(used[n]) n=NAMES[(h+i*11+3)%NAMES.length];
+    used[n]=1;
+    var texts=[
+      'روی دستگاه من روان بود و ارزش امتحان داشت.',
+      'بعد از یک ساعت هنوز جذبش بودم.',
+      'گرافیک و حس بازی خوب بود؛ پیشنهاد می‌کنم.',
+      'از لینک رسمی رفتم؛ مشکلی ندیدم.',
+      'برای وقتهای کوتاه هم مناسبه.',
+      'اگر ژانرش رو دوست دارید حتماً سر بزنید.',
+      'با دوستان که بازی کردیم خیلی بهتر شد.'
+    ];
+    out.push({who:n,txt:texts[(h+i*3)%texts.length]});
+  }
+  return out;
+}
+
+var HISTORY=[
+  {title:'Minecraft',meta:'۲۰۰۹ · مارکوس پرشون (Notch) · Mojang',body:'ماینکرافت ابتدا به‌عنوان نمونه اولیه در سال ۲۰۰۹ توسط مارکوس «ناچ» پرشون منتشر شد. نسخه آلفا به‌سرعت در انجمن‌های مستقل محبوب شد، چون بازیکن می‌توانست در دنیای وکسلی تقریباً بی‌نهایت بسازد یا بقا کند.\n\nنسخه رسمی ۱.۰ در نوامبر ۲۰۱۱ در MineCon عرضه شد. بعدها استودیو موجانگ توسط مایکروسافت خریداری شد و ماینکرافت به یکی از پرفروش‌ترین بازی‌های تاریخ تبدیل شد. نسخه‌های جاوا و بدراک، حالتهای بقا، خلاق، مودها، سرورهای انجمنی و رویدادهای بزرگ، مسیر آن را از یک پروژه مستقل به پدیده جهانی رساند.'},
+  {title:'Grand Theft Auto (GTA)',meta:'۱۹۹۷ تا امروز · DMA Design / Rockstar',body:'سری GTA با نسخه اول در ۱۹۹۷ از نگاه بالا شروع شد. GTA III در ۲۰۰۱ جهان را با جهان‌باز سه‌بعدی مدرن متحول کرد. Vice City و San Andreas شخصیت‌پردازی و موسیقی و مأموریت‌ها را گسترش دادند.\n\nGTA IV فیزیک و روایت سنگین‌تری آورد و GTA V در ۲۰۱۳ با لس‌سانتوس و سپس GTA Online به یکی از پردرآمدترین محصولات سرگرمی تبدیل شد. تأثیر سری روی ژانر جهان‌باز، فرهنگ عامه و طراحی مأموریت هنوز ادامه دارد.'},
+  {title:'Roblox',meta:'۲۰۰۶ · دیوید باسزوکی و اریک کسلم',body:'روبلکس از ایده ساخت دنیاهای کاربرمحور رشد کرد. بازیکنان نه فقط بازی می‌کنند، بلکه با ابزار ساخت، تجربه می‌سازند و گاهی درآمد کسب می‌کنند.\n\nتوسعه موبایل، سیستم روباکس، و بازار تجربههای کاربرساز، روبلاکس را به پلتفرم اجتماعی-بازی تبدیل کرد که مرز بین بازی و ابزار ساخت را کمرنگ کرده است.'},
+  {title:'Counter-Strike',meta:'۱۹۹۹ مود · ۲۰۰۰۰ والو',body:'کاونتر-استرایک ابتدا مود نیمه‌جان بود و بعد توسط والو خریداری و به محصول رسمی تبدیل شد. CS 1.6 فرهنگ اسکیربش و مسابقات را شکل داد.\n\nGlobal Offensive و سپس CS2 اقتصاد اسکین، صحنه اسپرts و نقشه‌های کلاسیکی مثل Dust2 را به جریان اصلی آوردند.'},
+  {title:'The Legend of Zelda',meta:'۱۹۸۶ · نینتندو · میاموتو / تزوکا',body:'زلدا با طراحی غیرخطی روی NES شروع شد و ایده «ماجراجویی آزاد در سرزمین بزرگ» را محبوب کرد. Ocarina of Time ساختار دوربین سه‌بعدی اکشن-ماجراجویی را تثبیت کرد.\n\nBreath of the Wild دوباره تعریف زلدا را با جهان باز فیزیکی و آزادی آزمایش تغییر داد و روی نسل بعد بازی‌های جهان‌باز اثر گذاشت.'},
+  {title:'Fortnite',meta:'۲۰۱۷ · Epic Games',body:'فورتنایت ابتدا به‌عنوان بازی نجات در برابر هیولا معرفی شد، اما حالت Battle Royale آن را به پدیده فرهنگی تبدیل کرد.\n\nفصل‌ها، کنسرت‌های داخل بازی، همکاریهای برند و مدل رایگان‌بودن با خریدهای ظاهری، مسیر بازی‌های زنده خدماتی را برای میلیون‌ها بازیکن بازتعریف کرد.'},
+  {title:'Call of Duty',meta:'۲۰۰۳ · Infinity Ward / Activision',body:'کال آو دیوتی ابتدا جنگ جهانی دوم را با ریتم سریع و سینمایی روایت کرد. Modern Warfare فضای مدرن و مولتی‌پلیر رقابتی را به اوج رساند.\n\nسالانه بودن سری، مودهای رقابتی، زامبی و بعداً Battle Royale (Warzone) آن را به یکی از محورهای شوتر کنسولی و PC تبدیل کرد.'},
+  {title:'GTA San Andreas & عصر کلاسیک Rockstar',meta:'۲۰۰۴ · Rockstar',body:'San Andreas با نقشه بسیار بزرگ‌تر، داستان شخصیت‌محور و آزادی حرکت، استاندارد جدیدی برای جهان‌باز گذاشت. تأثیر آن روی نسل بعد GTA و بازی‌های مشابه هنوز دیده می‌شود.'},
+  {title:'Among Us',meta:'۲۰۱۸ · InnerSloth',body:'این بازی کوچک اجتماعی بعد از دو سال با موج استریمرها ناگهان جهانی شد. مکانیک «خائن پنهان در جمع» الهام‌بخش ده‌ها بازی و شو تلویزیونی شد.'},
+  {title:'League of Legends',meta:'۲۰۰۹ · Riot Games',body:'لیگ از ژانر MOBA برآمده از دوتا دفاع باستانی رشد کرد و با قهرمان‌های متنوع، فصل‌های رقابتی و مسابقات جهانی به یکی از ستون‌های ورزش‌های الکترونیکی تبدیل شد.'},
+  {title:'Pokémon',meta:'۱۹۹۶ · Game Freak / نینتندو',body:'پوکمون با ایده جمع‌کردن موجودات و مبادله روی Game Boy شروع شد و به رسانه‌ای چندلایه شامل انیمه، کارت و بازی‌های نسل‌های متعدد تبدیل شد.'},
+  {title:'Half-Life',meta:'۱۹۹۸ · Valve',body:'نیمه‌جان روایت و گیم‌پلی شوتر را یکپارچه کرد و موتور و ابزار والو مسیر مودها (از جمله کاونتر-استرایک) را باز کرد. Half-Life 2 استاندارد فیزیک و روایت محیطی را بالاتر برد.'}
+];
+
+var REAL=[
+  {id:'roblox',title:'Roblox',badge:'HOT',tags:['pc','android'],platform:'PC · Android · iOS',desc:'روبلکس پلتفرم ساخت و بازی آنلاین است. از سایت رسمی دانلود کنید.',link:'https://www.roblox.com/download',c:['#e11d48','#1a0a10'],hot:100},
+  {id:'rw',title:'Rusted Warfare',badge:'NEW',tags:['pc','android','war','classic'],platform:'PC · Android',desc:longDesc('Rusted Warfare','RTS'),link:'https://store.steampowered.com/app/647960/Rusted_Warfare__RTS/',c:['#3d4a2a','#1a2210'],hot:96},
+  {id:'mindustry',title:'Mindustry',badge:'FREE',tags:['pc','android','war'],platform:'PC · Android',desc:longDesc('Mindustry','تاور دیفنس'),link:'https://mindustrygame.github.io/',c:['#2a4a3a','#0f1f18'],hot:93},
+  {id:'luanti',title:'Luanti',badge:'FREE',tags:['pc','android','classic'],platform:'PC · Android',desc:longDesc('Luanti','سندباکس'),link:'https://www.luanti.org/',c:['#3a5a2a','#152010'],hot:90},
+  {id:'stk',title:'SuperTuxKart',badge:'FREE',tags:['pc','android','race'],platform:'PC · Android',desc:longDesc('SuperTuxKart','مسابقه'),link:'https://supertuxkart.net/',c:['#2a3a5a','#101828'],hot:88},
+  {id:'wesnoth',title:'Battle for Wesnoth',badge:'CLASSIC',tags:['pc','android','war','classic'],platform:'PC · Android',desc:longDesc('Wesnoth','استراتژی نوبتی'),link:'https://www.wesnoth.org/',c:['#3a2a1a','#1a1208'],hot:84},
+  {id:'0ad',title:'0 A.D.',badge:'FREE',tags:['pc','war'],platform:'PC',desc:longDesc('0 A.D.','RTS تاریخی'),link:'https://play0ad.com/',c:['#4a3a2a','#1a140c'],hot:86},
+  {id:'openra',title:'OpenRA',badge:'CLASSIC',tags:['pc','war','classic'],platform:'PC',desc:longDesc('OpenRA','C&C'),link:'https://www.openra.net/',c:['#2a3a2a','#0c140c'],hot:83},
+  {id:'clutch',title:'کلاچ',badge:'IR',tags:['android','iran','race'],platform:'Android · بازار',desc:'ماشین‌سواری ایرانی — کافه‌بازار.',link:'https://cafebazaar.ir/app/ir.nomogame.clutch',c:['#5a2a1a','#1a0c08'],hot:94},
+  {id:'amirza',title:'آمیرزا',badge:'IR',tags:['android','iran'],platform:'Android · بازار',desc:'کلمات و دانستنی فارسی.',link:'https://cafebazaar.ir/app/ir.treedman.game.amirza',c:['#1a3a5a','#081420'],hot:95},
+  {id:'hokm',title:'حکم لازم',badge:'IR',tags:['android','iran'],platform:'Android · بازار',desc:'حکم و پاسور آنلاین.',link:'https://cafebazaar.ir/app/com.dreamland.hl',c:['#3a2a4a','#140c1a'],hot:92},
+  {id:'rwmod',title:'مود راستد — کانال ایرانی',badge:'MOD',tags:['mod','war'],platform:'تلگرام',desc:'مود و مپ جامعه Rusted Warfare.',link:'https://t.me/rusted_warfare_iran_apload',c:['#3d4a2a','#1a2210'],hot:87},
+  {id:'spd',title:'Shattered Pixel Dungeon',badge:'FREE',tags:['pc','android','classic'],platform:'PC · Android',desc:longDesc('SPD','روگ‌لایک'),link:'https://shatteredpixel.com/',c:['#2a1a3a','#100818'],hot:91},
+  {id:'openttd',title:'OpenTTD',badge:'CLASSIC',tags:['pc','classic'],platform:'PC',desc:longDesc('OpenTTD','شبیه‌سازی'),link:'https://www.openttd.org/',c:['#2a3a4a','#0c141c'],hot:89}
+];
+var WEB=[
+  {id:'w-4x4',title:'4x4 Builder',badge:'WEB',tags:['web','race'],platform:'تحت وب',desc:'آفرود تحت وب.',link:'https://4x4builder.com/',c:['#2a2a1a','#12120c'],hot:90},
+  {id:'w-slope',title:'Slope',badge:'WEB',tags:['web'],platform:'تحت وب',desc:'توپ روی سطح شیب‌دار.',link:'https://slopegame.io/',c:['#101820','#0a1018'],hot:92},
+  {id:'w-krunker',title:'Krunker.io',badge:'WEB',tags:['web','war'],platform:'تحت وب',desc:'شوتر تحت وب.',link:'https://krunker.io/',c:['#1a1a2e','#0f0f1a'],hot:94},
+  {id:'w-shell',title:'Shell Shockers',badge:'WEB',tags:['web','war'],platform:'تحت وب',desc:'شوتر IO.',link:'https://shellshock.io/',c:['#2a1a10','#1a1008'],hot:91},
+  {id:'w-2048',title:'2048',badge:'WEB',tags:['web'],platform:'تحت وب',desc:'پازل عددی.',link:'https://play2048.co/',c:['#bbada0','#776e65'],hot:89},
+  {id:'w-chess',title:'Chess.com',badge:'WEB',tags:['web'],platform:'تحت وب',desc:'شطرنج آنلاین.',link:'https://www.chess.com/play/online',c:['#312e2b','#1a1816'],hot:93},
+  {id:'w-tetris',title:'Tetris',badge:'WEB',tags:['web','classic'],platform:'تحت وب',desc:'تتریس وب.',link:'https://tetris.com/play-tetris',c:['#0f1b2e','#1e3a5f'],hot:90},
+  {id:'w-run3',title:'Run 3',badge:'WEB',tags:['web'],platform:'تحت وب',desc:'دونده تونلی.',link:'https://www.coolmathgames.com/0-run-3',c:['#0a0a12','#12121e'],hot:83},
+  {id:'w-basket',title:'Basket Random',badge:'WEB',tags:['web'],platform:'تحت وب',desc:'بسکتبال فیزیک‌محور.',link:'https://www.twoplayergames.org/game/basket-random',c:['#1a2a4a','#0c1420'],hot:82},
+  {id:'w-cookie',title:'Cookie Clicker',badge:'WEB',tags:['web'],platform:'تحت وب',desc:'ایدلر کلیکی.',link:'https://orteil.dashnet.org/cookieclicker/',c:['#3a2a1a','#1a1008'],hot:84},
+  {id:'w-agar',title:'Agar.io',badge:'WEB',tags:['web'],platform:'تحت وب',desc:'IO سلولی.',link:'https://agar.io/',c:['#1a2a3a','#0c1520'],hot:88},
+  {id:'w-fireboy',title:'Fireboy & Watergirl',badge:'WEB',tags:['web'],platform:'تحت وب',desc:'پازل دونفره.',link:'https://www.coolmathgames.com/0-fireboy-and-watergirl-forest-temple',c:['#2a1a10','#140c08'],hot:86}
+];
+
+function genItem(cat,i){
+  var h=hash(cat+':'+i);
+  var title=PREFIX[h%PREFIX.length]+' '+MID[(h>>3)%MID.length]+' '+SUF[(h>>7)%SUF.length];
+  var c1=hsl(h,50,32),c2=hsl(h+50,42,14);
+  var link='https://www.luanti.org/',platform='PC',badge='FREE';
+  if(cat==='iran'){link='https://cafebazaar.ir/search/?q='+encodeURIComponent(title);platform='بازار';badge='IR';}
+  else if(cat==='android'){link='https://play.google.com/store/search?q='+encodeURIComponent(title)+'&c=apps';platform='Android';}
+  else if(cat==='mod'){link='https://t.me/rusted_warfare_iran_apload';platform='مود';badge='MOD';}
+  else if(cat==='web'){link='https://www.coolmathgames.com/';platform='تحت وب';badge='WEB';}
+  else if(cat==='race'){link='https://supertuxkart.net/';platform='Race';}
+  else if(cat==='war'){link='https://play0ad.com/';platform='War';}
+  else if(cat==='classic'){link='https://www.wesnoth.org/';platform='Classic';badge='CLASSIC';}
+  return {id:cat+'_'+i,title:title,badge:badge,tags:[cat],platform:platform,desc:longDesc(title,cat),link:link,c:[c1,c2],hot:h%50};
+}
+function allForCat(cat){
+  var list=[],i=0;
+  REAL.forEach(function(g){if((g.tags||[]).indexOf(cat)!==-1)list.push(g)});
+  if(cat==='web') WEB.forEach(function(g){list.push(g)});
+  while(list.length<PER_CAT) list.push(genItem(cat,i++));
+  return list.slice(0,PER_CAT);
+}
+function src(g){return cover(g.title,g.c[0],g.c[1])}
+function findAny(id){
+  var i;for(i=0;i<REAL.length;i++) if(REAL[i].id===id) return REAL[i];
+  for(i=0;i<WEB.length;i++) if(WEB[i].id===id) return WEB[i];
+  var m=String(id).match(/^([a-z]+)_(\d+)$/); if(m) return genItem(m[1],parseInt(m[2],10));
+  return null;
+}
+
+/* theme */
+function applyTheme(id){
+  var t=THEMES.find(function(x){return x.id===id})||THEMES[0];
+  var r=document.documentElement.style;
+  r.setProperty('--bg',t.bg); r.setProperty('--card',t.card); r.setProperty('--panel',t.panel);
+  r.setProperty('--text',t.text); r.setProperty('--muted',t.muted);
+  r.setProperty('--accent',t.accent); r.setProperty('--accent2',t.accent2);
+  document.body.style.background=t.bg; document.body.style.color=t.text;
+  localStorage.setItem('gs_theme',t.id);
+  document.querySelectorAll('#themes button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-theme')===t.id)});
+}
+function renderThemes(){
+  document.getElementById('themes').innerHTML=THEMES.map(function(t){return '<button type="button" data-theme="'+t.id+'">'+t.name+'</button>'}).join('');
+}
+
+/* auth */
+function usersDB(){try{return JSON.parse(localStorage.getItem('gs_users')||'{}')}catch(e){return {}}}
+function saveUsers(u){localStorage.setItem('gs_users',JSON.stringify(u))}
+function session(){try{return JSON.parse(localStorage.getItem('gs_session')||'null')}catch(e){return null}}
+function setSession(s){if(s)localStorage.setItem('gs_session',JSON.stringify(s));else localStorage.removeItem('gs_session')}
+function refreshUser(){
+  var s=session();
+  document.getElementById('who').textContent=s?s.username:'مهمان';
+  document.getElementById('stUser').textContent=s?s.username:'مهمان';
+  document.getElementById('btnOut').classList.toggle('hidden',!s);
+  document.getElementById('btnAuth').textContent=s?'حساب':'ثبت‌نام / ورود';
+}
+
+var state={cat:'pc',page:0,q:'',mode:'cat',current:null,view:'games'};
+var favs={};try{favs=JSON.parse(localStorage.getItem('gs_favs')||'{}')}catch(e){}
+var recent=[];try{recent=JSON.parse(localStorage.getItem('gs_recent')||'[]')}catch(e){}
+
+function cardHTML(g){
+  return '<article class="card" data-id="'+g.id+'"><div class="cover"><img src="'+src(g)+'" alt="'+g.title+'" loading="lazy"><span class="badge '+g.badge+'">'+g.badge+'</span></div><div class="body"><h3>'+g.title+'</h3><div class="hint">برای مشاهده کلیک کنید</div></div></article>';
+}
+function filtered(){
+  if(state.mode==='fav'){var o=[];Object.keys(favs).forEach(function(id){var g=findAny(id);if(g)o.push(g)});return o}
+  var list=allForCat(state.cat);
+  if(state.q){var q=state.q;list=list.filter(function(g){return g.title.toLowerCase().indexOf(q)!==-1})}
+  return list;
+}
+function renderCats(){document.getElementById('cats').innerHTML=CATS.map(function(c){return '<button type="button" data-cat="'+c.id+'" class="'+(state.cat===c.id&&state.mode==='cat'?'on':'')+'">'+c.t+' · 1500</button>'}).join('')}
+function renderGrid(){
+  var list=filtered(); var end=Math.min(list.length,(state.page+1)*PAGE); var slice=list.slice(0,end);
+  document.getElementById('grid').innerHTML=slice.map(cardHTML).join('')||'<p style="color:var(--muted);font-size:12px">موردی نیست</p>';
+  document.getElementById('stShow').textContent=String(slice.length);
+  document.getElementById('stTotal').textContent=String(CATS.length*PER_CAT);
+  document.getElementById('stCat').textContent=state.mode==='fav'?'علاقه':state.cat;
+  document.getElementById('secCount').textContent=list.length+' مورد';
+  document.getElementById('more').style.display=end<list.length?'block':'none';
+}
+function renderHot(){document.getElementById('hot').innerHTML=REAL.concat(WEB).sort(function(a,b){return(b.hot||0)-(a.hot||0)}).slice(0,12).map(cardHTML).join('')}
+function renderWeb(){document.getElementById('web').innerHTML=WEB.map(cardHTML).join('')}
+function renderHistory(){
+  document.getElementById('histList').innerHTML=HISTORY.map(function(h){
+    return '<article class="hist"><h3>'+h.title+'</h3><div class="meta">'+h.meta+'</div><p>'+h.body+'</p></article>';
+  }).join('');
+}
+
+function openModal(id){
+  var g=findAny(id); if(!g) return;
+  state.current=g;
+  recent=recent.filter(function(x){return x!==id}); recent.unshift(id); recent=recent.slice(0,40);
+  localStorage.setItem('gs_recent',JSON.stringify(recent));
+  document.getElementById('mImg').src=src(g);
+  document.getElementById('mTitle').textContent=g.title;
+  document.getElementById('mDesc').textContent=g.desc||longDesc(g.title);
+  document.getElementById('mTags').innerHTML='<span>'+g.platform+'</span><span>'+g.badge+'</span>';
+  document.getElementById('mGo').href=g.link;
+  document.getElementById('mFav').textContent=favs[g.id]?'★ علاقه‌مند':'علاقه';
+  var extra=[]; try{extra=JSON.parse(localStorage.getItem('gs_c_'+g.id)||'[]')}catch(e){}
+  var all=extra.concat(g.comments||seedComments(g.id+g.title));
+  document.getElementById('mComments').innerHTML=all.map(function(c){return '<div class="com"><b>'+c.who+'</b>'+c.txt+'</div>'}).join('');
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(){document.getElementById('modal').classList.remove('open');state.current=null}
+
+function aiAnswer(q){
+  q=(q||'').toLowerCase();
+  if(q.indexOf('ماینکرافت')!==-1||q.indexOf('minecraft')!==-1) return HISTORY[0].body;
+  if(q.indexOf('gta')!==-1||q.indexOf('جی تی ای')!==-1||q.indexOf('جی‌تی‌ای')!==-1) return HISTORY[1].body;
+  if(q.indexOf('روبلکس')!==-1||q.indexOf('roblox')!==-1) return 'روبلکس را از roblox.com/download بگیرید. '+HISTORY[2].body.slice(0,220)+'…';
+  if(q.indexOf('کالاف')!==-1||q.indexOf('call of duty')!==-1) return HISTORY[6].body;
+  if(q.indexOf('ایرانی')!==-1||q.indexOf('بازار')!==-1) return 'آمیرزا، حکم لازم و کلاچ با لینک کافه‌بازار در دسته ایرانی هستند.';
+  if(q.indexOf('تحت')!==-1||q.indexOf('وب')!==-1) return 'بخش تحت‌وب: 4x4، Slope، Krunker و... کلیک = سایت اصلی.';
+  return 'از گیم‌اسپایر بپرسید درباره تاریخچه ماینکرافت، GTA، روبلاکس، کالاف یا بازی‌های ایرانی و تحت‌وب.';
+}
+function aiPush(role,t){var d=document.createElement('div');d.className='msg '+(role==='user'?'user':'bot');d.textContent=t;var c=document.getElementById('chat');c.appendChild(d);c.scrollTop=c.scrollHeight}
+function aiAsk(t){t=(t||'').trim();if(!t)return;aiPush('user',t);setTimeout(function(){aiPush('bot',aiAnswer(t))},200)}
+
+/* events */
+document.getElementById('themes').addEventListener('click',function(e){var b=e.target.closest('button[data-theme]');if(b)applyTheme(b.getAttribute('data-theme'))});
+document.getElementById('btnTheme').onclick=function(){document.getElementById('themeSec').scrollIntoView({behavior:'smooth'})};
+document.querySelectorAll('.tools [data-view]').forEach(function(btn){
+  btn.onclick=function(){
+    document.querySelectorAll('.tools [data-view]').forEach(function(x){x.classList.remove('on')});
+    btn.classList.add('on');
+    state.view=btn.getAttribute('data-view');
+    document.getElementById('gamesView').classList.toggle('hidden',state.view!=='games');
+    document.getElementById('historyView').classList.toggle('hidden',state.view!=='history');
+  };
+});
+document.getElementById('cats').onclick=function(e){var b=e.target.closest('button[data-cat]');if(!b)return;state.cat=b.getAttribute('data-cat');state.page=0;state.mode='cat';document.getElementById('btnFav').classList.remove('on');renderCats();renderGrid()};
+document.getElementById('grid').onclick=function(e){var c=e.target.closest('.card');if(c)openModal(c.getAttribute('data-id'))};
+document.getElementById('hot').onclick=function(e){var c=e.target.closest('.card');if(c)openModal(c.getAttribute('data-id'))};
+document.getElementById('web').onclick=function(e){var c=e.target.closest('.card');if(!c)return;var g=findAny(c.getAttribute('data-id'));if(g&&g.link)window.open(g.link,'_blank','noopener')};
+document.getElementById('more').onclick=function(){state.page++;renderGrid()};
+document.getElementById('q').oninput=function(e){state.q=(e.target.value||'').trim().toLowerCase();state.page=0;renderGrid()};
+document.getElementById('mX').onclick=closeModal;
+document.getElementById('modal').onclick=function(e){if(e.target.id==='modal')closeModal()};
+document.getElementById('mFav').onclick=function(){if(!state.current)return;var id=state.current.id;if(favs[id])delete favs[id];else favs[id]=1;localStorage.setItem('gs_favs',JSON.stringify(favs));document.getElementById('mFav').textContent=favs[id]?'★ علاقه‌مند':'علاقه'};
+document.getElementById('mSend').onclick=function(){
+  if(!state.current)return;
+  var v=(document.getElementById('mInput').value||'').trim(); if(!v)return;
+  var s=session(); var who=(s&&s.username)||NAMES[Math.floor(Math.random()*NAMES.length)];
+  var key='gs_c_'+state.current.id; var arr=[]; try{arr=JSON.parse(localStorage.getItem(key)||'[]')}catch(e){}
+  arr.unshift({who:who,txt:v}); localStorage.setItem(key,JSON.stringify(arr.slice(0,40)));
+  document.getElementById('mInput').value=''; openModal(state.current.id);
+};
+document.getElementById('btnFav').onclick=function(){state.mode=state.mode==='fav'?'cat':'fav';this.classList.toggle('on',state.mode==='fav');state.page=0;renderCats();renderGrid()};
+document.getElementById('btnRand').onclick=function(){var cat=CATS[Math.floor(Math.random()*CATS.length)].id;var list=allForCat(cat);var g=list[Math.floor(Math.random()*Math.min(list.length,200))];if(g)openModal(g.id)};
+document.getElementById('aiGo').onclick=function(){var v=document.getElementById('aiIn').value;document.getElementById('aiIn').value='';aiAsk(v)};
+document.getElementById('aiIn').onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();var v=e.target.value;e.target.value='';aiAsk(v)}};
+document.querySelector('.quick').onclick=function(e){var b=e.target.closest('button[data-q]');if(b)aiAsk(b.getAttribute('data-q'))};
+
+/* auth ui */
+document.getElementById('btnAuth').onclick=function(){document.getElementById('authOverlay').classList.add('open');document.getElementById('authErr').textContent=''};
+document.getElementById('authClose').onclick=function(){document.getElementById('authOverlay').classList.remove('open')};
+document.getElementById('authOverlay').onclick=function(e){if(e.target.id==='authOverlay')document.getElementById('authOverlay').classList.remove('open')};
+document.getElementById('tabReg').onclick=function(){this.classList.add('on');document.getElementById('tabLog').classList.remove('on');document.getElementById('regBox').classList.remove('hidden');document.getElementById('loginBox').classList.add('hidden')};
+document.getElementById('tabLog').onclick=function(){this.classList.add('on');document.getElementById('tabReg').classList.remove('on');document.getElementById('loginBox').classList.remove('hidden');document.getElementById('regBox').classList.add('hidden')};
+document.getElementById('btnReg').onclick=function(){
+  var u=(document.getElementById('regUser').value||'').trim();
+  var e=(document.getElementById('regEmail').value||'').trim().toLowerCase();
+  var p=document.getElementById('regPass').value||'';
+  var err=document.getElementById('authErr');
+  if(!/^[a-zA-Z0-9_]{3,24}$/.test(u)){err.textContent='نام کاربری: ۳ تا ۲۴ حرف/عدد';return}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){err.textContent='ایمیل نامعتبر';return}
+  if(p.length<6){err.textContent='رمز حداقل ۶ کاراکتر';return}
+  var db=usersDB();
+  for(var k in db){if(db[k].username===u){err.textContent='نام کاربری تکراری';return}if(db[k].email===e){err.textContent='ایمیل تکراری';return}}
+  var id='u_'+Date.now(); db[id]={id:id,username:u,email:e,pass:p}; saveUsers(db);
+  setSession({id:id,username:u,email:e}); refreshUser(); document.getElementById('authOverlay').classList.remove('open');
+};
+document.getElementById('btnLog').onclick=function(){
+  var id=(document.getElementById('logId').value||'').trim().toLowerCase();
+  var p=document.getElementById('logPass').value||'';
+  var err=document.getElementById('authErr'); var db=usersDB(), found=null;
+  for(var k in db){var x=db[k]; if(x.email===id||x.username.toLowerCase()===id){found=x;break}}
+  if(!found||found.pass!==p){err.textContent='ورود ناموفق';return}
+  setSession({id:found.id,username:found.username,email:found.email}); refreshUser(); document.getElementById('authOverlay').classList.remove('open');
+};
+document.getElementById('btnOut').onclick=function(){setSession(null);refreshUser()};
+document.onkeydown=function(e){if(e.key==='Escape'){closeModal();document.getElementById('authOverlay').classList.remove('open')}};
+
+renderThemes();
+applyTheme(localStorage.getItem('gs_theme')||'dark-orange');
+refreshUser();
+renderCats(); renderGrid(); renderHot(); renderWeb(); renderHistory();
+aiPush('bot','از گیم‌اسپایر بپرسید — درباره تاریخچه ماینکرافت، GTA، روبلاکس یا بازی‌های فهرست.');
+})();
+</script>
+</body>
+</html>
