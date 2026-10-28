@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GameSpire</title>
+<style>
+:root{
+  --bg:#0b0d12; --side:#0e1016; --panel:#12151d; --card:#161a24;
+  --line:rgba(255,255,255,.08); --text:#f2f4f8; --muted:#8b93a7;
+  --orange:#f97316; --orange2:#fb923c; --green:#22c55e;
+  --font:Inter,Tahoma,"Segoe UI",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font)}
+body{display:flex;overflow:hidden}
+button,input{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+a{color:inherit;text-decoration:none}
+img{display:block;width:100%;height:100%;object-fit:cover}
+
+/* ===== LEFT SIDEBAR (like mockup) ===== */
+.sidebar{
+  width:210px;flex-shrink:0;background:var(--side);border-left:1px solid var(--line);
+  display:flex;flex-direction:column;padding:14px 10px;z-index:20;
+}
+.sb-logo{
+  display:flex;align-items:center;gap:8px;padding:6px 8px 16px;font-weight:800;font-size:15px;
+}
+.sb-logo span{
+  width:28px;height:28px;border-radius:8px;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--orange),#fbbf24);color:#111;font-size:12px;font-weight:900;
+}
+.sb-nav{display:flex;flex-direction:column;gap:2px;flex:1;overflow:auto}
+.sb-nav button{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
+  color:var(--muted);font-size:13px;text-align:right;width:100%;
+}
+.sb-nav button i{width:18px;text-align:center;font-style:normal;font-size:14px;opacity:.9}
+.sb-nav button:hover{background:rgba(255,255,255,.04);color:var(--text)}
+.sb-nav button.on{background:rgba(249,115,22,.12);color:var(--orange)}
+.sb-foot{border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:2px}
+.sb-foot button{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:var(--muted);font-size:13px;width:100%;text-align:right}
+.sb-foot button:hover{background:rgba(255,255,255,.04);color:var(--text)}
+
+/* ===== MAIN ===== */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;position:relative}
+.bgfx{
+  position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:
+    linear-gradient(105deg, rgba(8,10,14,.94) 0%, rgba(8,10,14,.62) 42%, rgba(8,10,14,.28) 100%),
+    linear-gradient(180deg, rgba(8,10,14,.15), rgba(8,10,14,.88)),
+    url('bg.jpg') right center / cover no-repeat;
+}
+
+/* top bar */
+.topbar{
+  position:relative;z-index:10;display:flex;align-items:center;gap:14px;
+  padding:12px 20px;background:rgba(10,12,18,.45);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.top-brand{display:none}
+.search{flex:1;max-width:480px;margin:0 auto;position:relative}
+.search input{
+  width:100%;padding:11px 40px 11px 16px;border-radius:999px;border:1px solid var(--line);
+  background:rgba(0,0,0,.35);color:var(--text);outline:none;font-size:13px;
+}
+.search input:focus{border-color:rgba(249,115,22,.45)}
+.search .ico{position:absolute;right:14px;top:50%;transform:translateY(-50%);opacity:.45;font-size:14px}
+.top-right{display:flex;align-items:center;gap:8px}
+.icon-btn{
+  width:36px;height:36px;border-radius:50%;border:1px solid var(--line);
+  background:rgba(255,255,255,.04);color:var(--muted);display:grid;place-items:center;
+}
+.avatar{
+  width:34px;height:34px;border-radius:50%;border:2px solid rgba(249,115,22,.55);
+  background:linear-gradient(135deg,#334155,#1e293b);display:grid;place-items:center;
+  font-size:12px;font-weight:800;position:relative;
+}
+.avatar::after{
+  content:"";position:absolute;bottom:0;right:0;width:9px;height:9px;border-radius:50%;
+  background:var(--green);border:2px solid #0e1016;
+}
+
+/* content scroll */
+.content{position:relative;z-index:5;flex:1;overflow:auto;padding:0 22px 40px}
+.content::-webkit-scrollbar{width:8px}
+.content::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:8px}
+
+/* discover tabs */
+.dtabs{display:flex;gap:22px;padding:14px 0 10px;border-bottom:1px solid var(--line);margin-bottom:6px;overflow:auto}
+.dtabs button{color:var(--muted);font-size:13px;font-weight:600;padding:6px 0;position:relative;white-space:nowrap}
+.dtabs button.on{color:var(--orange)}
+.dtabs button.on::after{content:"";position:absolute;left:0;right:0;bottom:-11px;height:2px;background:var(--orange);border-radius:2px}
+
+/* HERO like mockup */
+.hero{padding:20px 0 8px;max-width:680px}
+.hero h1{
+  font-size:clamp(2.8rem,6.5vw,4.4rem);line-height:1.02;font-weight:600;letter-spacing:-1.2px;
+  font-family:Georgia,"Times New Roman",serif;
+  background:linear-gradient(180deg,#ffffff 10%,#b8c0ce 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.hero .line2{margin-top:10px;font-size:15px;font-weight:600}
+.hero .line2 .o{color:var(--orange)}
+.hero .line3{margin-top:8px;color:var(--muted);font-size:13px;line-height:1.75;max-width:520px}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.btn-orange{
+  background:linear-gradient(135deg,var(--orange),#ea580c);color:#111;font-weight:800;
+  padding:12px 18px;border-radius:12px;font-size:13px;box-shadow:0 10px 28px rgba(249,115,22,.28);
+}
+.btn-ghost{
+  border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);
+  padding:12px 18px;border-radius:12px;font-size:13px;font-weight:700;
+}
+
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 14px}
+.chips button{
+  border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);
+  padding:7px 13px;border-radius:999px;font-size:12px;
+}
+.chips button.on,.chips button:hover{color:#fff;border-color:rgba(249,115,22,.4);background:rgba(249,115,22,.12)}
+
+/* FEATURED ROW - exact mockup layout */
+.featured{display:grid;grid-template-columns:1.45fr .9fr;gap:14px;margin-bottom:22px}
+@media(max-width:980px){.featured{grid-template-columns:1fr}}
+
+.banner{
+  position:relative;border-radius:18px;overflow:hidden;min-height:280px;
+  border:1px solid var(--line);cursor:pointer;
+}
+.banner .bg{
+  position:absolute;inset:0;
+  background:
+    linear-gradient(90deg,rgba(0,0,0,.82) 0%,rgba(0,0,0,.4) 50%,rgba(0,0,0,.2) 100%),
+    url('bg.jpg') center/cover no-repeat;
+}
+.banner .body{position:relative;z-index:2;height:100%;padding:22px;display:flex;flex-direction:column;justify-content:flex-end;max-width:72%}
+.banner .badges{display:flex;gap:6px;margin-bottom:10px}
+.banner .badges span{
+  font-size:10px;font-weight:800;padding:3px 7px;border-radius:6px;
+  background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.12)
+}
+.b-hot{color:#fb7185}.b-free{color:#86efac}.b-ir{color:#fda4af}.b-new{color:#fde68a}.b-tr{color:#fdba74}
+.banner h2{font-size:1.75rem;font-weight:800;letter-spacing:.6px;margin-bottom:4px}
+.banner .sub{color:#d0d6e2;font-size:13px;margin-bottom:14px}
+.banner .play{
+  align-self:flex-start;background:linear-gradient(135deg,var(--orange),#ea580c);color:#111;
+  font-weight:800;font-size:12px;padding:10px 14px;border-radius:10px;
+}
+.banner .plat{
+  position:absolute;bottom:18px;left:18px;z-index:2;font-size:11px;color:var(--muted);
+  background:rgba(0,0,0,.45);border:1px solid var(--line);padding:4px 8px;border-radius:8px;
+}
+
+.side-cards{display:flex;flex-direction:column;gap:12px}
+.scard{
+  flex:1;min-height:130px;border-radius:16px;overflow:hidden;border:1px solid var(--line);
+  position:relative;cursor:pointer;background:#141820;
+}
+.scard .bg{position:absolute;inset:0}
+.scard .body{
+  position:relative;z-index:2;height:100%;padding:14px 16px;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  background:linear-gradient(90deg,rgba(0,0,0,.78),rgba(0,0,0,.2));
+}
+.scard .tag{font-size:10px;font-weight:800;color:var(--orange);margin-bottom:4px}
+.scard h3{font-size:14px;margin-bottom:2px}
+.scard p{font-size:11px;color:var(--muted)}
+.scard .plat{margin-top:6px;font-size:10px;color:#aab}
+
+/* discover grid section */
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;margin:6px 0 12px;gap:12px}
+.sec-head h2{font-size:1.1rem;font-weight:700}
+.sec-head p{color:var(--muted);font-size:12px;margin-top:3px}
+.sec-head .sort{color:var(--muted);font-size:12px}
+
+.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+@media(max-width:1200px){.grid{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:800px){.grid{grid-template-columns:repeat(2,1fr)}}
+.gcard{
+  background:rgba(18,22,30,.92);border:1px solid var(--line);border-radius:16px;overflow:hidden;
+  cursor:pointer;transition:transform .18s,border-color .18s,box-shadow .18s;
+}
+.gcard:hover{transform:translateY(-4px);border-color:rgba(249,115,22,.4);box-shadow:0 16px 36px rgba(0,0,0,.35)}
+.gcard .thumb{height:120px;position:relative;background:#10141c}
+.gcard .thumb .badge{
+  position:absolute;top:8px;right:8px;font-size:10px;font-weight:800;padding:3px 6px;border-radius:6px;
+  background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.1)
+}
+.gcard .meta{padding:10px}
+.gcard h3{font-size:12px;line-height:1.35;min-height:32px;margin-bottom:6px}
+.gcard .row{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--muted)}
+.gcard .row strong{color:#fbbf24}
+.more{width:100%;margin-top:14px;padding:12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);font-weight:700}
+
+/* other panels */
+.panel{display:none}
+.panel.on{display:block}
+.hist{background:rgba(18,22,30,.92);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px}
+.hist h3{color:var(--orange2);font-size:14px;margin-bottom:4px}
+.hist .m{font-size:11px;color:var(--muted);margin-bottom:6px}
+.hist p{font-size:12.5px;line-height:1.8;color:#c8d0de;white-space:pre-line}
+.ai-box{background:rgba(18,22,30,.92);border:1px solid var(--line);border-radius:16px;padding:14px;max-width:720px}
+.ai-box h2{font-size:15px;margin-bottom:4px}
+.ai-box .sub{color:var(--muted);font-size:12px;margin-bottom:8px}
+.chat{height:210px;overflow:auto;border:1px solid var(--line);border-radius:12px;padding:10px;background:rgba(0,0,0,.25);margin-bottom:8px}
+.msg{margin-bottom:7px;padding:8px 10px;border-radius:11px;max-width:90%;font-size:12.5px;line-height:1.65}
+.msg.bot{background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.2)}
+.msg.user{background:rgba(255,255,255,.06);border:1px solid var(--line);margin-right:auto}
+.ai-row{display:flex;gap:8px}
+.ai-row input{flex:1;padding:11px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.3);outline:none;color:var(--text)}
+.ai-row button{padding:11px 16px;border-radius:12px;background:linear-gradient(135deg,var(--orange),#ea580c);color:#111;font-weight:800}
+
+/* modals */
+.overlay,.modal{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:14px;background:rgba(0,0,0,.75);backdrop-filter:blur(10px)}
+.overlay.open,.modal.open{display:flex}
+.auth{width:min(400px,100%);border-radius:20px;background:linear-gradient(165deg,#1a1f2b,#10141c);border:1px solid var(--line);position:relative;overflow:hidden}
+.auth .x{position:absolute;top:10px;left:10px;width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:rgba(0,0,0,.4);color:#fff}
+.auth-h{padding:26px 18px 8px;text-align:center}
+.auth-h .m{width:48px;height:48px;margin:0 auto 8px;border-radius:14px;display:grid;place-items:center;font-weight:900;background:linear-gradient(135deg,var(--orange),#fbbf24);color:#111}
+.auth-b{padding:8px 18px 18px}
+.auth-b label{display:block;font-size:11px;color:var(--muted);margin:8px 0 4px}
+.auth-b input{width:100%;padding:11px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.3);outline:none;color:var(--text)}
+.auth-b .go{width:100%;margin-top:12px;padding:12px;border-radius:12px;background:linear-gradient(135deg,var(--orange),#ea580c);color:#111;font-weight:900}
+.auth-b .err{color:#fb7185;font-size:12px;text-align:center;min-height:16px;margin-top:6px}
+.tabs2{display:flex;gap:6px;background:rgba(255,255,255,.04);padding:4px;border-radius:12px;margin-bottom:8px}
+.tabs2 button{flex:1;padding:8px;border-radius:9px;color:var(--muted);font-weight:700;font-size:12px}
+.tabs2 button.on{background:rgba(249,115,22,.18);color:#fff}
+
+.sheet{width:min(520px,100%);max-height:90vh;overflow:auto;border-radius:18px;background:#141820;border:1px solid var(--line)}
+.sheet .hi{height:160px;position:relative;background:#0f141f}
+.sheet .hi .x{position:absolute;top:8px;left:8px;width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:rgba(0,0,0,.5);color:#fff}
+.sheet .ct{padding:14px}
+.sheet h3{margin-bottom:8px}
+.sheet .desc{font-size:13px;line-height:1.75;color:#c9d2e0;white-space:pre-line;margin-bottom:12px}
+.sheet .acts{display:flex;gap:8px}
+.sheet .acts a,.sheet .acts button{flex:1;text-align:center;padding:11px;border-radius:12px;font-weight:800}
+.sheet .acts a{background:linear-gradient(135deg,var(--orange),#ea580c);color:#111}
+.sheet .acts button{background:rgba(255,255,255,.07);border:1px solid var(--line);color:#fff}
+.coms{margin-top:12px}
+.coms h4{color:var(--orange2);font-size:12px;margin-bottom:6px}
+.com{padding:8px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--line);margin-bottom:6px;font-size:12px}
+.com b{display:block;margin-bottom:2px}
+.form{display:flex;gap:6px;margin-top:6px}
+.form input{flex:1;padding:9px;border-radius:10px;border:1px solid var(--line);background:rgba(0,0,0,.3);outline:none;color:var(--text)}
+.form button{padding:9px 12px;border-radius:10px;background:#fbbf24;color:#1a1200;font-weight:800}
+
+@media(max-width:800px){
+  body{flex-direction:column}
+  .sidebar{width:100%;height:auto;flex-direction:row;flex-wrap:wrap;border-left:0;border-top:1px solid var(--line);order:2;padding:8px}
+  .sb-nav{flex-direction:row;flex-wrap:wrap}
+  .sb-foot{flex-direction:row;border:0;padding:0}
+  .main{order:1;height:calc(100vh - 120px)}
+}
+</style>
+</head>
+<body>
+<!-- SIDEBAR exact labels from mockup -->
+<aside class="sidebar">
+  <div class="sb-logo"><span>G</span> GameSpire</div>
+  <nav class="sb-nav" id="sbNav">
+    <button type="button" class="on" data-go="all"><i>⌂</i> همه بازی‌ها</button>
+    <button type="button" data-go="war"><i>⚔</i> اکشن</button>
+    <button type="button" data-go="war"><i>◎</i> تیراندازی</button>
+    <button type="button" data-go="war"><i>♛</i> نبرد سلطنتی</button>
+    <button type="button" data-go="classic"><i>◈</i> جهان باز</button>
+    <button type="button" data-go="race"><i>▣</i> مسابقه‌ای</button>
+    <button type="button" data-go="classic"><i>◐</i> ترسناک</button>
+    <button type="button" data-go="iran"><i>⚽</i> ورزشی</button>
+    <button type="button" data-go="war"><i>♟</i> استراتژی</button>
+    <button type="button" data-go="history"><i>☰</i> تاریخچه</button>
+    <button type="button" data-go="ai"><i>✦</i> از گیم‌اسپایر بپرسید</button>
+  </nav>
+  <div class="sb-foot">
+    <button type="button" data-go="lib"><i>📚</i> کتابخانه من</button>
+    <button type="button" data-go="fav"><i>★</i> لیست علاقه‌مندی‌ها</button>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="bgfx"></div>
+
+  <header class="topbar">
+    <div class="search">
+      <input id="q" type="search" placeholder="Search games, news, creators...">
+      <span class="ico">⌕</span>
+    </div>
+    <div class="top-right">
+      <button class="icon-btn" type="button" id="btnSun">☀</button>
+      <button class="icon-btn" type="button" id="btnMoon">☾</button>
+      <div class="avatar" id="avatar">G</div>
+    </div>
+  </header>
+
+  <div class="content" id="content">
+    <div class="panel on" id="panel-home">
+      <div class="dtabs" id="dtabs">
+        <button type="button" data-tab="discover" class="on">Discover</button>
+        <button type="button" data-tab="top">Top Games</button>
+        <button type="button" data-tab="new">New Releases</button>
+        <button type="button" data-tab="free">Free to Play</button>
+        <button type="button" data-tab="premium">Premium</button>
+        <button type="button" data-tab="esports">Esports</button>
+      </div>
+
+      <section class="hero">
+        <h1>GameSpire</h1>
+        <div class="line2"><span class="o">Elevate Your Game.</span> Define Your Legacy.</div>
+        <div class="line3">بازی کن. الهام بگیر. تاریخ بساز. بهترین تجربه‌ها در ژانرهای تیراندازی، استراتژی و دنیای باز — هر هفته، کشفیات جدید. همیشه، سطح بالاتر.</div>
+        <div class="cta">
+          <button class="btn-orange" type="button" id="btnExplore">Explore Games →</button>
+          <button class="btn-ghost" type="button" id="btnPremium">◆ Browse Premium</button>
+        </div>
+      </section>
+
+      <div class="chips" id="chips">
+        <button type="button" data-cat="all" class="on">All Games</button>
+        <button type="button" data-cat="war">Action</button>
+        <button type="button" data-cat="war">Shooter</button>
+        <button type="button" data-cat="classic">RPG</button>
+        <button type="button" data-cat="war">Strategy</button>
+        <button type="button" data-cat="classic">Adventure</button>
+        <button type="button" data-cat="race">Racing</button>
+        <button type="button" data-cat="web">Web</button>
+      </div>
+
+      <div class="featured">
+        <article class="banner" id="banner" data-id="rw">
+          <div class="bg"></div>
+          <div class="body">
+            <div class="badges"><span class="b-hot">HOT</span><span class="b-free">FREE</span><span class="b-ir">IR</span></div>
+            <h2>WARZONE FRONTIER</h2>
+            <div class="sub">The Battle Has No Borders</div>
+            <button class="play" type="button">Play Free Now →</button>
+          </div>
+          <div class="plat">⊞ PC</div>
+        </article>
+        <div class="side-cards">
+          <article class="scard" data-id="mindustry">
+            <div class="bg" style="background:linear-gradient(135deg,#1a3a2a,#0a1510)"></div>
+            <div class="body">
+              <div class="tag">NEW</div>
+              <h3>ECLIPSE AWAKENING</h3>
+              <p>A New Myth Begins</p>
+              <div class="plat">RPG · PC · PS5</div>
+            </div>
+          </article>
+          <article class="scard" data-id="openra">
+            <div class="bg" style="background:linear-gradient(135deg,#2a2a1a,#12100a)"></div>
+            <div class="body">
+              <div class="tag">TRENDING</div>
+              <h3>SHADOW SIEGE</h3>
+              <p>Control. Conquer. Command.</p>
+              <div class="plat">STRATEGY · PC</div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <div class="sec-head">
+        <div>
+          <h2>Discover Exceptional Games</h2>
+          <p>Sorted for players who demand more</p>
+        </div>
+        <div class="sort">Sort by: Popularity ›</div>
+      </div>
+      <div class="grid" id="grid"></div>
+      <button class="more" type="button" id="more">View All →</button>
+    </div>
+
+    <div class="panel" id="panel-history">
+      <div class="sec-head"><div><h2>تاریخچه بازی‌های معروف</h2><p>جزئیات شکل‌گیری آثار ماندگار</p></div></div>
+      <div id="histList"></div>
+    </div>
+
+    <div class="panel" id="panel-ai">
+      <div class="ai-box">
+        <h2>از گیم‌اسپایر بپرسید</h2>
+        <div class="sub">راهنمای فارسی بازی‌ها</div>
+        <div class="chat" id="chat"></div>
+        <div class="ai-row"><input id="aiIn" placeholder="از گیم‌اسپایر بپرسید..."><button type="button" id="aiGo">ارسال</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="auth">
+  <div class="auth">
+    <button class="x" type="button" id="authX">×</button>
+    <div class="auth-h"><div class="m">G</div><h2 style="font-size:1.2rem">GameSpire</h2><p style="color:var(--muted);font-size:12px;margin-top:4px">ثبت‌نام اختیاری</p></div>
+    <div class="auth-b">
+      <div class="tabs2"><button type="button" class="on" id="tabReg">ثبت‌نام</button><button type="button" id="tabLog">ورود</button></div>
+      <div id="regBox">
+        <label>نام کاربری</label><input id="regUser" maxlength="24">
+        <label>ایمیل</label><input id="regEmail" type="email">
+        <label>رمز</label><input id="regPass" type="password">
+        <button class="go" type="button" id="btnReg">ساخت حساب</button>
+      </div>
+      <div id="logBox" style="display:none">
+        <label>ایمیل یا نام کاربری</label><input id="logId">
+        <label>رمز</label><input id="logPass" type="password">
+        <button class="go" type="button" id="btnLog">ورود</button>
+      </div>
+      <div class="err" id="authErr"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="sheet">
+    <div class="hi"><img id="mImg" alt=""><button class="x" id="mX" type="button">×</button></div>
+    <div class="ct">
+      <h3 id="mTitle">—</h3>
+      <div class="desc" id="mDesc"></div>
+      <div class="acts"><a id="mGo" href="#" target="_blank" rel="noopener">باز کردن / دانلود</a><button type="button" id="mFav">علاقه</button></div>
+      <div class="coms"><h4>نظرات</h4><div id="mComments"></div>
+        <div class="form"><input id="mInput" maxlength="200" placeholder="نظر شما..."><button type="button" id="mSend">ارسال</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var PAGE=12, page=0, cat='all', tab='discover', q='';
+var NAMES=['آرمان','کیان','سارا','رضا','نرگس','پویا','مینا','حسین','دانیال','هستی','ایلیا','غزل','آرش','نیما','بهار','فرهاد','یاسمن','ماهان','النا','رادین','شایان','باران','کاوه','رها'];
+
+function cover(t,c1,c2){
+  t=String(t).slice(0,18).replace(/[<>&]/g,'');
+  return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="'+c1+'"/><stop offset="1" stop-color="'+c2+'"/></linearGradient></defs><rect width="640" height="400" fill="url(#g)"/><text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" font-family="Segoe UI,Tahoma" font-size="26" font-weight="800" fill="rgba(255,255,255,.92)">'+t+'</text></svg>'
+  );
+}
+function hash(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h}
+function seedComments(seed){
+  var h=hash(seed),out=[],u={};
+  for(var i=0;i<5;i++){
+    var n=NAMES[(h+i*11)%NAMES.length];if(u[n])n=NAMES[(h+i*5+3)%NAMES.length];u[n]=1;
+    out.push({who:n,txt:['عالیه، پیشنهاد می‌کنم.','روان بود روی سیستمم.','از لینک رسمی رفتم.','برای وقت آزاد مناسبه.','حس بازی خیلی خوبه.'][(h+i)%5]});
+  }
+  return out;
+}
+
+var GAMES=[
+  {id:'rw',title:'WARZONE FRONTIER',sub:'Rusted Warfare',badge:'HOT',tags:['war','pc','android'],platform:'PC · Android',rate:'4.9',price:'FREE',desc:'نبرد بدون مرز — نسخه اصلی Rusted Warfare از منبع رسمی.\n\nRTS کامل با مودپذیری بالا برای PC و اندروید.',link:'https://store.steampowered.com/app/647960/Rusted_Warfare__RTS/',c:['#3d2a1a','#1a1008']},
+  {id:'mindustry',title:'ECLIPSE AWAKENING',sub:'Mindustry',badge:'NEW',tags:['war','pc','android'],platform:'PC · Android',rate:'4.7',price:'FREE',desc:'تاور دیفنس + کارخانه متن‌باز.',link:'https://mindustrygame.github.io/',c:['#1a3a2a','#0a1510']},
+  {id:'openra',title:'SHADOW SIEGE',sub:'OpenRA',badge:'FREE',tags:['war','classic','pc'],platform:'PC',rate:'4.6',price:'FREE',desc:'باززایی مدرن C&C.',link:'https://www.openra.net/',c:['#2a2a1a','#12100a']},
+  {id:'clutch',title:'HELLBOUND PROTOCOL',sub:'کلاچ',badge:'IR',tags:['race','iran','android'],platform:'PC · PS5',rate:'4.8',price:'IR',desc:'ماشین‌سواری ایرانی — کافه‌بازار.',link:'https://cafebazaar.ir/app/ir.nomogame.clutch',c:['#4a1a10','#1a0804']},
+  {id:'stk',title:'VELOCITY LEGENDS',sub:'SuperTuxKart',badge:'FREE',tags:['race','pc','android'],platform:'PC · XBOX',rate:'4.6',price:'FREE',desc:'مسابقه کارتونی رایگان.',link:'https://supertuxkart.net/',c:['#1a2a4a','#0a1420']},
+  {id:'0ad',title:'BEYOND THE FRONT',sub:'0 A.D.',badge:'FREE',tags:['war','pc'],platform:'PC',rate:'4.5',price:'$59.99',desc:'RTS تاریخی متن‌باز.',link:'https://play0ad.com/',c:['#3a2a1a','#1a1008']},
+  {id:'amirza',title:'ASHEN REBELLION',sub:'آمیرزا',badge:'HOT',tags:['iran','android'],platform:'PC · PS5',rate:'4.7',price:'HOT',desc:'کلمات و دانستنی فارسی.',link:'https://cafebazaar.ir/app/ir.treedman.game.amirza',c:['#2a1a18','#100c08']},
+  {id:'luanti',title:'NORDIC EXPANSE',sub:'Luanti',badge:'FREE',tags:['classic','pc','android'],platform:'PC',rate:'4.5',price:'$49.99',desc:'سندباکس وکسل متن‌باز.',link:'https://www.luanti.org/',c:['#1a2a3a','#0a141c']},
+  {id:'hokm',title:'IRONCLAD OFFENSIVE',sub:'حکم لازم',badge:'FREE',tags:['iran','android'],platform:'PC',rate:'4.5',price:'FREE',desc:'حکم و پاسور آنلاین.',link:'https://cafebazaar.ir/app/com.dreamland.hl',c:['#2a3a2a','#0c140c']},
+  {id:'roblox',title:'ROBLOX',sub:'Official',badge:'HOT',tags:['pc','android'],platform:'PC · Mobile',rate:'4.8',price:'FREE',desc:'دانلود رسمی روبلاکس.',link:'https://www.roblox.com/download',c:['#e11d48','#1a0a10']},
+  {id:'spd',title:'PIXEL SIEGE',sub:'Shattered PD',badge:'FREE',tags:['classic','pc','android'],platform:'PC · Android',rate:'4.8',price:'FREE',desc:'روگ‌لایک پیکسلی.',link:'https://shatteredpixel.com/',c:['#2a1a3a','#100818']},
+  {id:'wesnoth',title:'CROWN OF EMBERS',sub:'Wesnoth',badge:'FREE',tags:['war','classic'],platform:'PC',rate:'4.4',price:'FREE',desc:'استراتژی نوبتی فانتزی.',link:'https://www.wesnoth.org/',c:['#3a2a1a','#1a1008']},
+  {id:'w-4x4',title:'4x4 BUILDER',sub:'Web',badge:'WEB',tags:['web','race'],platform:'Web',rate:'4.4',price:'WEB',desc:'آفرود تحت وب.',link:'https://4x4builder.com/',c:['#2a2a1a','#12100c']},
+  {id:'w-krunker',title:'KRUNKER.IO',sub:'Web',badge:'WEB',tags:['web','war'],platform:'Web',rate:'4.6',price:'WEB',desc:'شوتر تحت وب.',link:'https://krunker.io/',c:['#1a1a2e','#0f0f1a']},
+  {id:'w-slope',title:'SLOPE',sub:'Web',badge:'WEB',tags:['web'],platform:'Web',rate:'4.5',price:'WEB',desc:'توپ روی مسیر شیب‌دار.',link:'https://slopegame.io/',c:['#101820','#0a1018']},
+  {id:'rwmod',title:'RUSTED MODS IR',sub:'Telegram',badge:'MOD',tags:['mod','war'],platform:'Telegram',rate:'4.6',price:'MOD',desc:'مود و مپ جامعه راستد.',link:'https://t.me/rusted_warfare_iran_apload',c:['#3d4a2a','#1a2210']}
+];
+
+var PRE=['Shadow','Neon','Cyber','Iron','Apex','Blaze','Frost','Void','Prime','Ultra','Crimson','Solar'];
+var MID=['Ops','Front','Siege','Rush','Legacy','Force','Edge','Zone','Core','Shift','Protocol','Legends'];
+function gen(i,tag){
+  var h=hash(tag+':'+i);
+  return {id:'x'+tag+i,title:(PRE[h%PRE.length]+' '+MID[(h>>3)%MID.length]).toUpperCase(),sub:'Catalog',badge:tag==='iran'?'IR':tag==='web'?'WEB':'FREE',tags:[tag],platform:'PC',rate:(4+(h%10)/10).toFixed(1),price:tag==='web'?'WEB':'FREE',desc:'عنوان فهرست GameSpire.',link:tag==='iran'?'https://cafebazaar.ir/':tag==='web'?'https://www.coolmathgames.com/':'https://www.luanti.org/',c:['hsl('+(h%360)+',42%,28%)','hsl('+((h+50)%360)+',36%,12%)']};
+}
+for(var i=0;i<60;i++){GAMES.push(gen(i,'war'),gen(i+70,'classic'),gen(i+140,'race'),gen(i+210,'iran'),gen(i+280,'web'));}
+
+var HISTORY=[
+  {t:'Minecraft',m:'۲۰۰۹ · Notch / Mojang',b:'از نمونه ۲۰۰۹ تا پدیده جهانی و خرید مایکروسافت. وکسل، بقا و مودها صنعت را عوض کردند.'},
+  {t:'Grand Theft Auto',m:'۱۹۹۷–اکنون · Rockstar',b:'از نگاه بالا تا جهان‌باز سه‌بعدی و GTA Online.'},
+  {t:'Call of Duty',m:'۲۰۰۳ · Activision',b:'از جنگ جهانی تا Modern Warfare و Warzone.'},
+  {t:'Roblox',m:'۲۰۰۶',b:'پلتفرم کاربرساز؛ مرز بازی و ابزار ساخت.'},
+  {t:'Counter-Strike',m:'۱۹۹۹ مود · Valve',b:'از مود نیمه‌جان تا صحنه اسپرts.'},
+  {t:'Fortnite',m:'۲۰۱۷ · Epic',b:'بتل‌رویال به‌عنوان رویداد زنده فرهنگی.'},
+  {t:'Zelda',m:'۱۹۸۶ · Nintendo',b:'از NES تا Breath of the Wild.'},
+  {t:'Half-Life',m:'۱۹۹۸ · Valve',b:'یکپارچگی روایت و شوتر؛ بستر مودهای تاریخ‌ساز.'}
+];
+
+function src(g){return cover(g.title,g.c[0],g.c[1])}
+function filtered(){
+  var list=GAMES.slice();
+  if(tab==='free') list=list.filter(function(g){return g.badge==='FREE'||g.badge==='WEB'||g.price==='FREE'});
+  if(tab==='top') list=list.slice().sort(function(a,b){return parseFloat(b.rate)-parseFloat(a.rate)});
+  if(tab==='new') list=list.filter(function(g){return g.badge==='NEW'||g.badge==='HOT'});
+  if(cat!=='all') list=list.filter(function(g){return (g.tags||[]).indexOf(cat)!==-1});
+  if(q) list=list.filter(function(g){return (g.title+g.sub).toLowerCase().indexOf(q)!==-1});
+  return list;
+}
+function cardHTML(g){
+  return '<article class="gcard" data-id="'+g.id+'"><div class="thumb"><img src="'+src(g)+'" alt="'+g.title+'" loading="lazy"><span class="badge">'+g.badge+'</span></div><div class="meta"><h3>'+g.title+'</h3><div class="row"><span>'+g.platform+'</span><strong>'+(g.price==='FREE'||g.badge==='FREE'?'★ '+g.rate:g.price)+'</strong></div></div></article>';
+}
+function render(){
+  var list=filtered();
+  var slice=list.slice(0,(page+1)*PAGE);
+  document.getElementById('grid').innerHTML=slice.map(cardHTML).join('');
+  document.getElementById('more').style.display=slice.length<list.length?'block':'none';
+}
+function show(name){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('on')});
+  if(name==='history'){
+    document.getElementById('panel-history').classList.add('on');
+    document.getElementById('histList').innerHTML=HISTORY.map(function(h){return '<article class="hist"><h3>'+h.t+'</h3><div class="m">'+h.m+'</div><p>'+h.b+'</p></article>'}).join('');
+  } else if(name==='ai'){
+    document.getElementById('panel-ai').classList.add('on');
+  } else {
+    document.getElementById('panel-home').classList.add('on');
+    if(name==='fav'){
+      var favs={};try{favs=JSON.parse(localStorage.getItem('gs_favs')||'{}')}catch(e){}
+      document.getElementById('grid').innerHTML=GAMES.filter(function(g){return favs[g.id]}).map(cardHTML).join('')||'<p style="color:#8b93a7">لیست علاقه خالی است.</p>';
+    } else render();
+  }
+}
+function find(id){return GAMES.find(function(g){return g.id===id})}
+function openModal(id){
+  var g=find(id); if(!g) return;
+  document.getElementById('mImg').src=src(g);
+  document.getElementById('mTitle').textContent=g.title;
+  document.getElementById('mDesc').textContent=g.desc;
+  document.getElementById('mGo').href=g.link;
+  var favs={};try{favs=JSON.parse(localStorage.getItem('gs_favs')||'{}')}catch(e){}
+  document.getElementById('mFav').textContent=favs[g.id]?'★ علاقه‌مند':'علاقه';
+  document.getElementById('mFav').dataset.id=g.id;
+  var extra=[];try{extra=JSON.parse(localStorage.getItem('gs_c_'+g.id)||'[]')}catch(e){}
+  document.getElementById('mComments').innerHTML=extra.concat(seedComments(g.id)).map(function(c){return '<div class="com"><b>'+c.who+'</b>'+c.txt+'</div>'}).join('');
+  document.getElementById('modal').classList.add('open');
+}
+
+/* events */
+document.getElementById('sbNav').onclick=function(e){
+  var b=e.target.closest('button[data-go]'); if(!b) return;
+  document.querySelectorAll('#sbNav button').forEach(function(x){x.classList.remove('on')});
+  b.classList.add('on');
+  var go=b.getAttribute('data-go');
+  if(go==='history'||go==='ai'){show(go);return}
+  if(go==='fav'||go==='lib'){show('fav');return}
+  cat=go; page=0; tab='discover'; show('home');
+  document.querySelectorAll('#dtabs button').forEach(function(x){x.classList.toggle('on',x.dataset.tab==='discover')});
+};
+document.querySelector('.sb-foot').onclick=function(e){
+  var b=e.target.closest('button[data-go]'); if(!b) return;
+  show(b.getAttribute('data-go')==='fav'||b.getAttribute('data-go')==='lib'?'fav':'home');
+};
+document.getElementById('dtabs').onclick=function(e){
+  var b=e.target.closest('button[data-tab]'); if(!b) return;
+  document.querySelectorAll('#dtabs button').forEach(function(x){x.classList.remove('on')});
+  b.classList.add('on'); tab=b.dataset.tab; page=0; show('home');
+};
+document.getElementById('chips').onclick=function(e){
+  var b=e.target.closest('button[data-cat]'); if(!b) return;
+  document.querySelectorAll('#chips button').forEach(function(x){x.classList.remove('on')});
+  b.classList.add('on'); cat=b.dataset.cat; page=0; render();
+};
+document.getElementById('grid').onclick=function(e){var c=e.target.closest('.gcard'); if(c) openModal(c.dataset.id)};
+document.getElementById('banner').onclick=function(){openModal('rw')};
+document.querySelectorAll('.scard').forEach(function(el){el.onclick=function(){openModal(el.dataset.id)}});
+document.getElementById('more').onclick=function(){page++;render()};
+document.getElementById('q').oninput=function(e){q=(e.target.value||'').trim().toLowerCase();page=0;render()};
+document.getElementById('btnExplore').onclick=function(){document.getElementById('grid').scrollIntoView({behavior:'smooth'})};
+document.getElementById('btnPremium').onclick=function(){tab='top';page=0;render();document.getElementById('grid').scrollIntoView({behavior:'smooth'})};
+document.getElementById('mX').onclick=function(){document.getElementById('modal').classList.remove('open')};
+document.getElementById('modal').onclick=function(e){if(e.target.id==='modal')document.getElementById('modal').classList.remove('open')};
+document.getElementById('mFav').onclick=function(){
+  var id=this.dataset.id; if(!id) return;
+  var favs={};try{favs=JSON.parse(localStorage.getItem('gs_favs')||'{}')}catch(e){}
+  if(favs[id]) delete favs[id]; else favs[id]=1;
+  localStorage.setItem('gs_favs',JSON.stringify(favs));
+  this.textContent=favs[id]?'★ علاقه‌مند':'علاقه';
+};
+document.getElementById('mSend').onclick=function(){
+  var id=document.getElementById('mFav').dataset.id; if(!id) return;
+  var v=(document.getElementById('mInput').value||'').trim(); if(!v) return;
+  var s=null;try{s=JSON.parse(localStorage.getItem('gs_session')||'null')}catch(e){}
+  var who=(s&&s.username)||NAMES[Math.floor(Math.random()*NAMES.length)];
+  var arr=[];try{arr=JSON.parse(localStorage.getItem('gs_c_'+id)||'[]')}catch(e){}
+  arr.unshift({who:who,txt:v}); localStorage.setItem('gs_c_'+id,JSON.stringify(arr.slice(0,30)));
+  document.getElementById('mInput').value=''; openModal(id);
+};
+
+/* auth optional */
+document.getElementById('avatar').onclick=function(){document.getElementById('auth').classList.add('open')};
+document.getElementById('authX').onclick=function(){document.getElementById('auth').classList.remove('open')};
+document.getElementById('auth').onclick=function(e){if(e.target.id==='auth')document.getElementById('auth').classList.remove('open')};
+document.getElementById('tabReg').onclick=function(){this.classList.add('on');document.getElementById('tabLog').classList.remove('on');document.getElementById('regBox').style.display='block';document.getElementById('logBox').style.display='none'};
+document.getElementById('tabLog').onclick=function(){this.classList.add('on');document.getElementById('tabReg').classList.remove('on');document.getElementById('logBox').style.display='block';document.getElementById('regBox').style.display='none'};
+document.getElementById('btnReg').onclick=function(){
+  var u=(document.getElementById('regUser').value||'').trim(), e=(document.getElementById('regEmail').value||'').trim().toLowerCase(), p=document.getElementById('regPass').value||'';
+  var err=document.getElementById('authErr');
+  if(u.length<3||e.indexOf('@')<0||p.length<6){err.textContent='اطلاعات ناقص/نامعتبر';return}
+  var db={};try{db=JSON.parse(localStorage.getItem('gs_users')||'{}')}catch(ex){}
+  for(var k in db){if(db[k].username===u||db[k].email===e){err.textContent='تکراری است';return}}
+  var id='u'+Date.now(); db[id]={id:id,username:u,email:e,pass:p}; localStorage.setItem('gs_users',JSON.stringify(db));
+  localStorage.setItem('gs_session',JSON.stringify({id:id,username:u,email:e}));
+  document.getElementById('avatar').textContent=u.slice(0,1).toUpperCase();
+  document.getElementById('auth').classList.remove('open');
+};
+document.getElementById('btnLog').onclick=function(){
+  var id=(document.getElementById('logId').value||'').trim().toLowerCase(), p=document.getElementById('logPass').value||'';
+  var db={};try{db=JSON.parse(localStorage.getItem('gs_users')||'{}')}catch(e){}
+  var found=null; for(var k in db){if(db[k].email===id||db[k].username.toLowerCase()===id){found=db[k];break}}
+  if(!found||found.pass!==p){document.getElementById('authErr').textContent='ورود ناموفق';return}
+  localStorage.setItem('gs_session',JSON.stringify({id:found.id,username:found.username,email:found.email}));
+  document.getElementById('avatar').textContent=found.username.slice(0,1).toUpperCase();
+  document.getElementById('auth').classList.remove('open');
+};
+
+document.getElementById('aiGo').onclick=function(){
+  var v=(document.getElementById('aiIn').value||'').trim(); if(!v) return;
+  document.getElementById('aiIn').value='';
+  var chat=document.getElementById('chat');
+  var u=document.createElement('div'); u.className='msg user'; u.textContent=v; chat.appendChild(u);
+  var ans='از گیم‌اسپایر بپرسید درباره ماینکرافت، GTA، کالاف یا بازی‌های فهرست.';
+  var low=v.toLowerCase();
+  if(low.indexOf('ماینکرافت')!==-1) ans=HISTORY[0].b;
+  else if(low.indexOf('gta')!==-1||low.indexOf('جی')!==-1) ans=HISTORY[1].b;
+  else if(low.indexOf('کالاف')!==-1) ans=HISTORY[2].b;
+  else if(low.indexOf('روبلکس')!==-1) ans='دانلود رسمی: roblox.com/download';
+  setTimeout(function(){var b=document.createElement('div');b.className='msg bot';b.textContent=ans;chat.appendChild(b);chat.scrollTop=chat.scrollHeight},200);
+  chat.scrollTop=chat.scrollHeight;
+};
+document.getElementById('aiIn').onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();document.getElementById('aiGo').click()}};
+
+try{
+  var s=JSON.parse(localStorage.getItem('gs_session')||'null');
+  if(s&&s.username) document.getElementById('avatar').textContent=s.username.slice(0,1).toUpperCase();
+}catch(e){}
+
+render();
+var c=document.getElementById('chat');
+var hello=document.createElement('div'); hello.className='msg bot'; hello.textContent='از گیم‌اسپایر بپرسید — تاریخچه یا راهنمای بازی‌ها.'; c.appendChild(hello);
+})();
+</script>
+</body>
+</html>
